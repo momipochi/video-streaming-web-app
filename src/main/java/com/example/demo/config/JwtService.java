@@ -1,5 +1,8 @@
 package com.example.demo.config;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,15 +14,12 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-
 @Service
 public class JwtService {
     private static final String SECRET_SIGN_KEY = "V6SJKqsfA4mEYx0KC1LtMtzNrIwoCX7nKNXS3jNdQdRlrkA8kAE3XzyclkwD1AFJ";
 
     public String extractUserEmail(String token) {
+
         return extractClaim(token, Claims::getSubject);
     }
 

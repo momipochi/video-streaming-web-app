@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,8 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.demo.user.UserRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
@@ -23,6 +22,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
+
         return email -> repository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }

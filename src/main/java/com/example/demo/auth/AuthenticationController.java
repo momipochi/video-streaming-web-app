@@ -1,5 +1,6 @@
 package com.example.demo.auth;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,12 +11,18 @@ import com.example.demo.constants.AuthApiConstants;
 
 @RestController
 @RequestMapping(AuthApiConstants.REQUEST_MAPPING_V1)
+@RequiredArgsConstructor
 public class AuthenticationController {
-    private AuthenticationService authService;
+    private final AuthenticationService authService;
 
     @PostMapping(AuthApiConstants.REGISTER)
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest req) {
-        return ResponseEntity.ok(authService.register(req));
+    public ResponseEntity<Object> register(@RequestBody RegisterRequest req) {
+        try {
+            return ResponseEntity.ok(authService.register(req));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.badRequest().body("User already exists");
     }
 
     @PostMapping(AuthApiConstants.AUTHENTICATE)
