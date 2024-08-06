@@ -8,6 +8,8 @@ Using stream buffers to send chunks of video instead of simply serving full vide
 
 # Authentication/Authorization
 
+Jwt Authentication/Authorization
+
 # Techstack
 
 SpringBoot, Hibernate, Maven, Docker, Kubernetes
