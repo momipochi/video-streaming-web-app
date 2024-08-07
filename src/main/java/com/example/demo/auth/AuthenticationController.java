@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.config.ApiResponse;
 import com.example.demo.constants.AuthApiConstants;
 
 @RestController
@@ -16,13 +17,14 @@ public class AuthenticationController {
     private final AuthenticationService authService;
 
     @PostMapping(AuthApiConstants.REGISTER)
-    public ResponseEntity<Object> register(@RequestBody RegisterRequest req) {
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> register(@RequestBody RegisterRequest req) {
         try {
-            return ResponseEntity.ok(authService.register(req));
+            return ResponseEntity.ok(new ApiResponse<AuthenticationResponse>(true, authService.register(req), null));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return ResponseEntity.badRequest().body("User already exists");
+        return ResponseEntity.badRequest()
+                .body(new ApiResponse<AuthenticationResponse>(false, null, "User already exists"));
     }
 
     @PostMapping(AuthApiConstants.AUTHENTICATE)

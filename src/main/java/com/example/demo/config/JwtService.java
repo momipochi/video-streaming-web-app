@@ -1,22 +1,23 @@
 package com.example.demo.config;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.MacAlgorithm;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
-    private static final String SECRET_SIGN_KEY = "V6SJKqsfA4mEYx0KC1LtMtzNrIwoCX7nKNXS3jNdQdRlrkA8kAE3XzyclkwD1AFJ";
+    private static final MacAlgorithm alg = Jwts.SIG.HS256;
+    private static final SecretKey key = alg.key().build();
 
     public String extractUserEmail(String token) {
 
@@ -29,7 +30,7 @@ public class JwtService {
 
     public String generateToken(Map<String, Object> additionalClaims, UserDetails userdetails) {
         return Jwts.builder().claims(additionalClaims).subject(userdetails.getUsername()).issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)).signWith(getSignInKey()).compact();
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)).signWith(key, alg).compact();
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
@@ -38,12 +39,7 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token).getPayload();
-    }
-
-    private SecretKey getSignInKey() {
-        byte[] keyByte = Decoders.BASE64.decode(SECRET_SIGN_KEY);
-        return new SecretKeySpec(keyByte, "HmacSHA256");
+        return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).accept(Jws.CLAIMS).getPayload();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
