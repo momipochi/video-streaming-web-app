@@ -1,7 +1,5 @@
 package com.example.demo.config;
 
-import java.util.UUID;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -21,10 +19,6 @@ public class DbSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        UUID userId = UUID.randomUUID();
-        UUID videoId = UUID.randomUUID();
-        System.out.println(userId + " |||| " + videoId);
-
         User newUser = User.builder().email("gg@gmail.com").name("gg").password("gg").role(Role.USER).build();
         userRepository.save(newUser);
         Video vid = Video.builder().uploader(newUser).title("cool vid").path("./src/main/resources/storage/som.mp4")
