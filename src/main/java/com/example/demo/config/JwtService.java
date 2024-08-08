@@ -6,8 +6,7 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.MacAlgorithm;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +19,9 @@ import java.util.Map;
 
 @Service
 public class JwtService {
-    private static final MacAlgorithm alg = Jwts.SIG.HS256;
-    private static final SecretKey key = alg.key().build();
+    @Value("${application.security.jwt.secret-key}")
+    private String secretKey;
+
     private static JwtParser jwtParser;
     private static JwtBuilder jwtBuilder;
 
@@ -37,7 +37,7 @@ public class JwtService {
     public String generateToken(Map<String, Object> additionalClaims, UserDetails userdetails) {
         jwtBuilder = Jwts.builder();
         return jwtBuilder.subject(userdetails.getUsername()).issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 86400000)).signWith(key)
+                .expiration(new Date(System.currentTimeMillis() + 86400000)).signWith(getSigninKey())
                 .compact();
     }
 
@@ -46,8 +46,13 @@ public class JwtService {
         return claimResolver.apply(claims);
     }
 
+    private SecretKey getSigninKey() {
+        byte[] keyBytes = Decoders.BASE64URL.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
     private Claims extractAllClaims(String token) {
-        jwtParser = Jwts.parser().verifyWith(key).build();
+        jwtParser = Jwts.parser().verifyWith(getSigninKey()).build();
         return jwtParser.parseSignedClaims(token).getPayload();
     }
 
